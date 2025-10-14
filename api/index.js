@@ -121,9 +121,9 @@ app.use((req, res, next) => {
 });
 
 // POST /api/generate (full path)
-app.post('/api/generate', upload.array('images'), async (req, res) => {
+app.post('/generate', upload.array('images'), async (req, res) => {
   try {
-    console.log('POST /api/generate hit! Path:', req.path);
+    console.log('POST /generate hit! Path:', req.path);
     console.log('Body:', req.body);
     console.log('Files count:', req.files?.length || 0);
 
@@ -316,15 +316,15 @@ react-project/
       message: `Generated successfully using API key ${usedKeyIndex + 1}`
     });
   } catch (error) {
-    console.error('Error in /api/generate:', error);
+    console.error('Error in /generate:', error);
     res.status(500).json({ error: error.message });
   }
 });
 
 // POST /api/projects/:id/review (full path)
-app.post('/api/projects/:id/review', async (req, res) => {
+app.post('/projects/:id/review', async (req, res) => {
   try {
-    console.log('POST /api/projects/:id/review hit! Path:', req.path);
+    console.log('POST /projects/:id/review hit! Path:', req.path);
 
     const { error } = reviewSchema.validate(req.body);
     if (error) return res.status(400).json({ error: error.details[0].message });
@@ -371,32 +371,32 @@ app.post('/api/projects/:id/review', async (req, res) => {
       message: `Reviewed successfully using API key ${usedKeyIndex + 1}`
     });
   } catch (error) {
-    console.error('Error in /api/projects/:id/review:', error);
+    console.error('Error in /projects/:id/review:', error);
     res.status(500).json({ error: error.message });
   }
 });
 
 // GET /api/projects/:id (full path)
-app.get('/api/projects/:id', async (req, res) => {
+app.get('/projects/:id', async (req, res) => {
   try {
-    console.log('GET /api/projects/:id hit! Path:', req.path);
+    console.log('GET /projects/:id hit! Path:', req.path);
     const project = await Project.findById(req.params.id);
     if (!project) return res.status(404).json({ error: 'Project not found' });
     res.json({ files: project.files });
   } catch (error) {
-    console.error('Error in /api/projects/:id:', error);
+    console.error('Error in /projects/:id:', error);
     res.status(500).json({ error: error.message });
   }
 });
 
 // GET /api/projects (full path)
-app.get('/api/projects', async (req, res) => {
+app.get('/projects', async (req, res) => {
   try {
-    console.log('GET /api/projects hit! Path:', req.path);
+    console.log('GET /projects hit! Path:', req.path);
     const projects = await Project.find().sort({ createdAt: -1 }).limit(10);
     res.json(projects.map(p => ({ id: p._id, description: p.description, createdAt: p.createdAt })));
   } catch (error) {
-    console.error('Error in /api/projects:', error);
+    console.error('Error in /projects:', error);
     res.status(500).json({ error: error.message });
   }
 });
