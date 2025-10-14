@@ -120,19 +120,22 @@ app.use((req, res, next) => {
   next();
 });
 
-// POST /api/generate (full path)
-app.post('/generate', upload.array('images'), async (req, res) => {
+// POST /api/generate
+app.post('/', upload.array('images'), async (req, res) => {
   try {
-    console.log('POST /generate hit! Path:', req.path);
+    console.log('POST / hit! Path:', req.path);
     console.log('Body:', req.body);
     console.log('Files count:', req.files?.length || 0);
 
     const { error } = generateSchema.validate({ description: req.body.description });
     if (error) return res.status(400).json({ error: error.details[0].message });
 
-    const images = req.files ? req.files.map(file => `data:${file.mimetype};base64,${file.buffer.toString('base64')}`) : [];
+    const images = req.files
+      ? req.files.map(file => `data:${file.mimetype};base64,${file.buffer.toString('base64')}`)
+      : [];
 
     let userParts = [];
+
     if (images.length > 0) {
       images.forEach(img => {
         userParts.push({
@@ -413,5 +416,13 @@ app.use((err, req, res, next) => {
   res.status(500).json({ error: 'Something went wrong!' });
 });
 
-// تصدير لـ Vercel serverless
+// ✅ تكوين خاص لـ Vercel (عشان يتعامل مع Express من غير مشاكل)
+export const config = {
+  api: {
+    bodyParser: false,
+  },
+};
+
+// ✅ التصدير بالشكل اللي Vercel بيحتاجه
 export default app;
+
