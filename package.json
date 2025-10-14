@@ -1,8 +1,8 @@
 {
-  "name": "ai-react-generator",
+  "name": "ai-react-generator-fullstack",
   "version": "1.0.0",
   "type": "module",
-  "description": "AI React Project Generator Full Stack",
+  "description": "Full-stack AI React Project Generator",
   "main": "api/index.js",
   "scripts": {
     "start": "node api/index.js",
