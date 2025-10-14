@@ -1,4 +1,4 @@
-// api/index.js (الكود الكامل المعدّل لإصلاح 404/500 - serverless function في Vercel)
+// index.js (الكود الكامل المعدّل لإصلاح 404/500 - serverless function في Vercel)
 import express from 'express';
 import mongoose from 'mongoose';
 import cors from 'cors';
@@ -120,10 +120,10 @@ app.use((req, res, next) => {
   next();
 });
 
-// POST /api/generate
-app.post('/', upload.array('images'), async (req, res) => {
+// ✅ المسار الرئيسي المعدل ليتوافق مع Vercel
+app.post('/api', upload.array('images'), async (req, res) => {
   try {
-    console.log('POST / hit! Path:', req.path);
+    console.log('✅ POST /api hit!');
     console.log('Body:', req.body);
     console.log('Files count:', req.files?.length || 0);
 
@@ -319,15 +319,15 @@ react-project/
       message: `Generated successfully using API key ${usedKeyIndex + 1}`
     });
   } catch (error) {
-    console.error('Error in /generate:', error);
+    console.error('Error in /api:', error);
     res.status(500).json({ error: error.message });
   }
 });
 
-// POST /api/projects/:id/review (full path)
+// ✅ المسارات الأخرى معدلة لتتوافق مع هيكل Vercel
 app.post('/projects/:id/review', async (req, res) => {
   try {
-    console.log('POST /projects/:id/review hit! Path:', req.path);
+    console.log('POST /projects/:id/review hit!');
 
     const { error } = reviewSchema.validate(req.body);
     if (error) return res.status(400).json({ error: error.details[0].message });
@@ -379,10 +379,10 @@ app.post('/projects/:id/review', async (req, res) => {
   }
 });
 
-// GET /api/projects/:id (full path)
+// ✅ GET /projects/:id 
 app.get('/projects/:id', async (req, res) => {
   try {
-    console.log('GET /projects/:id hit! Path:', req.path);
+    console.log('GET /projects/:id hit!');
     const project = await Project.findById(req.params.id);
     if (!project) return res.status(404).json({ error: 'Project not found' });
     res.json({ files: project.files });
@@ -392,10 +392,10 @@ app.get('/projects/:id', async (req, res) => {
   }
 });
 
-// GET /api/projects (full path)
+// ✅ GET /projects 
 app.get('/projects', async (req, res) => {
   try {
-    console.log('GET /projects hit! Path:', req.path);
+    console.log('GET /projects hit!');
     const projects = await Project.find().sort({ createdAt: -1 }).limit(10);
     res.json(projects.map(p => ({ id: p._id, description: p.description, createdAt: p.createdAt })));
   } catch (error) {
@@ -404,19 +404,24 @@ app.get('/projects', async (req, res) => {
   }
 });
 
-// 404 handler for API routes
-app.use((req, res) => {
-  console.log(`404 - Route not found: ${req.method} ${req.path}`);
+// ✅ 404 handler for API routes
+app.use('/api', (req, res) => {
+  console.log(`404 - API route not found: ${req.method} ${req.path}`);
   res.status(404).json({ error: 'API route not found' });
 });
 
-// Error handling middleware
+// ✅ Error handling middleware
 app.use((err, req, res, next) => {
   console.error(`Error middleware hit: ${req.method} ${req.path}`, err.stack);
   res.status(500).json({ error: 'Something went wrong!' });
 });
 
-// ✅ تكوين خاص لـ Vercel (عشان يتعامل مع Express من غير مشاكل)
+// ✅ Health check route
+app.get('/health', (req, res) => {
+  res.status(200).json({ message: '✅ API is working successfully!', timestamp: new Date().toISOString() });
+});
+
+// ✅ إعداد خاص لـ Vercel
 export const config = {
   api: {
     bodyParser: false,
@@ -425,4 +430,3 @@ export const config = {
 
 // ✅ التصدير بالشكل اللي Vercel بيحتاجه
 export default app;
-
