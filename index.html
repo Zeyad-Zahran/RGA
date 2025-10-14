@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI React Project Generator - Vanilla JS - Full Stack</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Cairo', sans-serif;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+            min-height: 100vh;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+        }
+        h1 {
+            text-align: center;
+            color: #4a5568;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+            font-weight: 700;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        h2, h3 {
+            color: #2d3748;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 10px;
+            margin-top: 40px;
+        }
+        textarea {
+            width: 100%;
+            height: 120px;
+            margin-bottom: 20px;
+            padding: 15px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 16px;
+            font-family: 'Cairo', sans-serif;
+            resize: vertical;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+        textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        button {
+            width: 100%;
+            padding: 15px 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 18px;
+            font-weight: 600;
+            font-family: 'Cairo', sans-serif;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+            margin-bottom: 20px;
+        }
+        button:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+        button:disabled {
+            background: #a0aec0;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+        pre {
+            background: #f7fafc;
+            padding: 20px;
+            overflow: auto;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+            font-size: 14px;
+            line-height: 1.6;
+            white-space: pre-wrap;
+            max-height: 400px;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+        ul {
+            list-style: none;
+            padding: 0;
+        }
+        ul li {
+            background: #edf2f7;
+            margin: 10px 0;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+        ul li strong {
+            color: #2d3748;
+        }
+        /* Loader Styles */
+        .loader {
+            height: 45px;
+            --c: no-repeat linear-gradient(#514b82 0 0);
+            background: 
+                var(--c) left,
+                var(--c) center,
+                var(--c) right;
+            background-size: 16px 100%;
+            animation: 
+                l33-1 1.5s infinite,
+                l33-2 1.5s infinite;
+            margin: 20px auto;
+            display: none;
+        }
+        @keyframes l33-1 {
+            0%,100% {width:45px}
+            35%,65% {width:65px}
+        }
+        @keyframes l33-2 {
+            0%,40%  {transform: rotate(0) }
+            60%,100%{transform: rotate(90deg) }
+        }
+        #loader {
+            display: block;
+        }
+        .success-message {
+            background: #c6f6d5;
+            color: #22543d;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 10px;
+            border: 1px solid #9ae6b4;
+        }
+        #preview {
+            margin-top: 20px;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+        #preview iframe {
+            width: 100%;
+            height: 500px;
+            border: 0;
+        }
+        .error-message {
+            background: #fed7d7;
+            color: #c53030;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 10px;
+            border: 1px solid #feb2b2;
+        }
+        .review-section {
+            margin-top: 20px;
+        }
+        .review-section button {
+            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+            margin-bottom: 10px;
+        }
+        .images-section {
+            margin: 20px 0;
+            padding: 20px;
+            background: #f7fafc;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+        }
+        .images-section h3 {
+            margin-top: 0;
+            border-bottom: none;
+            padding-bottom: 0;
+        }
+        .file-input-wrapper {
+            position: relative;
+            display: inline-block;
+            width: 100%;
+            margin-bottom: 10px;
+        }
+        #imageInput {
+            position: absolute;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
+        .file-input-label {
+            display: block;
+            padding: 15px;
+            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+            color: white;
+            text-align: center;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: transform 0.2s ease;
+        }
+        .file-input-label:hover {
+            transform: translateY(-2px);
+        }
+        #uploadedImages {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        #uploadedImages img {
+            max-width: 150px;
+            max-height: 150px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+                margin: 10px;
+            }
+            h1 {
+                font-size: 2em;
+            }
+            pre {
+                font-size: 12px;
+            }
+            #preview iframe {
+                height: 300px;
+            }
+        }
+    </style>
+    <!-- تضمين JSZip عبر CDN لإنشاء ZIP -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <!-- تضمين jsonrepair لإصلاح JSON المعطل -->
+    <script src="https://cdn.jsdelivr.net/npm/jsonrepair/lib/umd/jsonrepair.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h1>مولد مشاريع React بالذكاء الاصطناعي - باستخدام Vanilla JS - Full Stack</h1>
+        <div class="images-section">
+            <h3>رفع صور التصميم (اختياري)</h3>
+            <div class="file-input-wrapper">
+                <input type="file" id="imageInput" accept="image/*" multiple>
+                <label for="imageInput" class="file-input-label">اختر صورًا للتصميم (يمكن رفع متعددة)</label>
+            </div>
+            <div id="uploadedImages"></div>
+        </div>
+        <textarea id="input" placeholder="وصف المشروع أو التحديث (مثل: أنشئ تطبيق React لقائمة مهام مع صفحات مترابطة)"></textarea>
+        <button id="generateBtn">ولد المشروع</button>
+        <div id="loader" class="loader"></div>
+        <h2>الكود المولد (سيتم تنزيله كـ ZIP):</h2>
+        <pre id="output"></pre>
+        <h2>معاينة المشروع المباشرة (في CodeSandbox):</h2>
+        <div id="preview"></div>
+        <div id="review-section" class="review-section" style="display: none;">
+            <h3>مراجعة الكود</h3>
+            <textarea id="reviewInput" placeholder="صف الخطأ أو التحسين المطلوب (مثل: أصلح خطأ في App.js)"></textarea>
+            <button id="reviewBtn">مراجعة وإصلاح</button>
+        </div>
+        <h3>تاريخ الدردشة (للسياق):</h3>
+        <ul id="history"></ul>
+        <p style="font-size: 14px; color: #666; margin-top: 20px;">
+            إذا وجدت أخطاء في المعاينة، يمكنك وصفها في الإدخال أعلاه لتصحيحها تلقائيًا مع الحفاظ على السياق. يمكن رفع صور لتحليل التصميم البصري باستخدام Gemini 2.5 Flash.
+        </p>
+    </div>
+
+    <script>
+        const BACKEND_URL = '/api'; // For Vercel deployment, use relative path
+        const input = document.getElementById('input');
+        const generateBtn = document.getElementById('generateBtn');
+        const output = document.getElementById('output');
+        const historyList = document.getElementById('history');
+        const loader = document.getElementById('loader');
+        const previewDiv = document.getElementById('preview');
+        const reviewSection = document.getElementById('review-section');
+        const reviewInput = document.getElementById('reviewInput');
+        const reviewBtn = document.getElementById('reviewBtn');
+        const imageInput = document.getElementById('imageInput');
+        const uploadedImagesDiv = document.getElementById('uploadedImages');
+        let chatHistory = []; // Local for UI, but backend handles persistence
+        let currentProject = null; // {id, files}
+        let uploadedImageFiles = [];
+
+        // معالجة رفع الصور
+        imageInput.addEventListener('change', (e) => {
+            uploadedImageFiles = Array.from(e.target.files);
+            uploadedImagesDiv.innerHTML = '';
+            uploadedImageFiles.forEach(file => {
+                const img = document.createElement('img');
+                img.src = URL.createObjectURL(file);
+                uploadedImagesDiv.appendChild(img);
+            });
+        });
+
+        // Display message function
+        function displayMessage(message, type = 'success') {
+            const msgDiv = document.createElement('div');
+            msgDiv.className = type === 'success' ? 'success-message' : 'error-message';
+            msgDiv.textContent = message;
+            output.appendChild(msgDiv);
+            setTimeout(() => msgDiv.remove(), 5000);
+        }
+
+        // Generate project via backend
+        async function generateProject(description, images) {
+            const formData = new FormData();
+            formData.append('description', description);
+            images.forEach((file, index) => {
+                formData.append(`image${index}`, file);
+            });
+
+            const response = await fetch(`${BACKEND_URL}/generate`, {
+                method: 'POST',
+                body: formData
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            return await response.json();
+        }
+
+        // Review project via backend
+        async function reviewProject(projectId, reviewDescription) {
+            const response = await fetch(`${BACKEND_URL}/projects/${projectId}/review`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ reviewDescription })
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            return await response.json();
+        }
+
+        generateBtn.addEventListener('click', async () => {
+            const description = input.value.trim();
+            if (!description && uploadedImageFiles.length === 0) return;
+
+            generateBtn.disabled = true;
+            generateBtn.textContent = 'جاري التوليد...';
+            loader.style.display = 'block';
+            output.innerHTML = '';
+            previewDiv.innerHTML = '';
+            reviewSection.style.display = 'none';
+
+            try {
+                const result = await generateProject(description, uploadedImageFiles);
+                currentProject = { id: result.projectId, files: result.files };
+
+                // عرض الـ JSON في الصفحة
+                output.textContent = JSON.stringify(result.files, null, 2);
+
+                // إنشاء ZIP باستخدام JSZip
+                const zip = new JSZip();
+                for (const [filePath, content] of Object.entries(result.files)) {
+                    zip.file(filePath, content);
+                }
+                const zipBlob = await zip.generateAsync({ type: 'blob' });
+
+                // تنزيل الـ ZIP
+                const url = URL.createObjectURL(zipBlob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'react-project.zip';
+                a.click();
+                URL.revokeObjectURL(url);
+
+                // إنشاء معاينة في CodeSandbox
+                await createSandboxPreview(result.files);
+
+                // تحديث التاريخ
+                const userMessageText = description || 'بناءً على الصور المرفوعة';
+                chatHistory.push({ role: 'user', parts: [{ text: userMessageText }] });
+                chatHistory.push({ role: 'model', parts: [{ text: 'تم توليد المشروع بنجاح' }] });
+                updateHistory();
+
+                displayMessage('تم توليد المشروع بنجاح!');
+            } catch (error) {
+                displayMessage(`حدث خطأ: ${error.message}`, 'error');
+                reviewSection.style.display = 'block';
+            } finally {
+                loader.style.display = 'none';
+                generateBtn.disabled = false;
+                generateBtn.textContent = 'ولد المشروع';
+                input.value = '';
+                imageInput.value = ''; // مسح الرفع
+                uploadedImagesDiv.innerHTML = '';
+                uploadedImageFiles = [];
+            }
+        });
+
+        reviewBtn.addEventListener('click', async () => {
+            if (!currentProject) return;
+            const reviewDescription = reviewInput.value.trim();
+            if (!reviewDescription) return;
+
+            reviewBtn.disabled = true;
+            reviewBtn.textContent = 'جاري المراجعة...';
+            loader.style.display = 'block';
+            output.innerHTML = '';
+            previewDiv.innerHTML = '';
+
+            try {
+                const result = await reviewProject(currentProject.id, reviewDescription);
+                currentProject.files = result.files;
+
+                // عرض
+                output.textContent = JSON.stringify(result.files, null, 2);
+
+                // ZIP
+                const zip = new JSZip();
+                for (const [filePath, content] of Object.entries(result.files)) {
+                    zip.file(filePath, content);
+                }
+                const zipBlob = await zip.generateAsync({ type: 'blob' });
+
+                const url = URL.createObjectURL(zipBlob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'react-project-reviewed.zip';
+                a.click();
+                URL.revokeObjectURL(url);
+
+                // CodeSandbox
+                await createSandboxPreview(result.files);
+
+                // تحديث تاريخ
+                chatHistory.push({ role: 'user', parts: [{ text: reviewDescription }] });
+                chatHistory.push({ role: 'model', parts: [{ text: 'تم مراجعة المشروع بنجاح' }] });
+                updateHistory();
+
+                reviewInput.value = '';
+                displayMessage('تم مراجعة المشروع بنجاح!');
+            } catch (error) {
+                displayMessage(`حدث خطأ في المراجعة: ${error.message}`, 'error');
+            } finally {
+                loader.style.display = 'none';
+                reviewBtn.disabled = false;
+                reviewBtn.textContent = 'مراجعة وإصلاح';
+            }
+        });
+
+        async function createSandboxPreview(files) {
+            try {
+                const transformedFiles = {};
+                for (const [filePath, contentStr] of Object.entries(files)) {
+                    let fileContent;
+                    if (filePath === 'package.json' || filePath.endsWith('.json')) {
+                        fileContent = { content: JSON.parse(contentStr) };
+                    } else {
+                        fileContent = { content: contentStr };
+                    }
+                    transformedFiles[filePath] = fileContent;
+                }
+
+                const sandboxResponse = await fetch('https://codesandbox.io/api/v1/sandboxes/define?json=1', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ files: transformedFiles })
+                });
+
+                if (sandboxResponse.ok) {
+                    const sandboxData = await sandboxResponse.json();
+                    const sandboxId = sandboxData.sandbox_id;
+                    if (sandboxId) {
+                        const embedUrl = `https://codesandbox.io/embed/${sandboxId}?view=preview&fontsize=14&hidenavigation=1&theme=light`;
+                        previewDiv.innerHTML = `
+                            <iframe
+                                src="${embedUrl}"
+                                style="width:100%; height:500px; border:0; border-radius: 4px; overflow:hidden;"
+                                title="React Preview"
+                                allow="geolocation; microphone; camera; midi; vr; accelerometer; gyroscope; payment; clipboard-read; clipboard-write"
+                                sandbox="allow-modals allow-forms allow-popups allow-scripts allow-same-origin">
+                            </iframe>
+                            <p style="text-align: center; margin-top: 10px; font-size: 14px; color: #666;">
+                                <a href="https://codesandbox.io/s/${sandboxId}" target="_blank" rel="noopener noreferrer">فتح في CodeSandbox (محرر كامل)</a>
+                            </p>
+                        `;
+                        return;
+                    }
+                }
+                throw new Error('فشل في الحصول على sandbox_id');
+            } catch (sandboxError) {
+                previewDiv.innerHTML = `<div class="error-message">فشل في إنشاء المعاينة: ${sandboxError.message}. يمكنك تنزيل الـ ZIP وتشغيله محليًا.</div>`;
+                reviewSection.style.display = 'block';
+            }
+        }
+
+        function updateHistory() {
+            historyList.innerHTML = '';
+            chatHistory.forEach((msg) => {
+                const li = document.createElement('li');
+                li.innerHTML = `<strong>${msg.role === 'user' ? 'أنت:' : 'AI:'}</strong> ${msg.parts[0].text}`;
+                historyList.appendChild(li);
+            });
+        }
+    </script>
+</body>
+</html>
